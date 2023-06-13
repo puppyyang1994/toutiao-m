@@ -1,7 +1,10 @@
 <template>
   <div class="login-container">
     <!-- 导航栏 -->
-    <van-nav-bar class="page-nav-bar" title="登录" />
+    <van-nav-bar class="page-nav-bar" title="登录">
+      <van-icon slot="left" name="cross" @click="$router.back()" />
+    </van-nav-bar>
+
     <!-- 登录表单栏 -->
 
     <!-- 表单验证
@@ -51,6 +54,7 @@
           >
         </template>
       </van-field>
+
       <div class="login-btn-wrap">
         <van-button class="login-btn" block type="default" native-type="submit">
           登录
@@ -83,7 +87,7 @@ export default {
           { pattern: /^\d{6}$/, message: '验证码错误' }
         ]
       },
-      isCountDownShow: false //是否展示倒计时
+      isCountDownShow: false // 是否展示倒计时
     }
   },
   computed: {},
@@ -96,20 +100,24 @@ export default {
       const user = this.user
       this.$toast.loading({
         message: '登录中...',
-        forbidClick: true, //禁用背景点击
+        forbidClick: true, // 禁用背景点击
         duration: 0 //
       })
       //  2. 表单验证
       // 3.提交表单 请求登录
       try {
         // 这里一定要解构 不然后面的status判断不出类型
-        const res = await login(this.user)
+        const res = await login(user)
         const { data } = res
 
         // 在组件中必须通过 this.$toast 来调用
         // 登录成功后 修改state中的数据
         this.$store.commit('setUser', data.data)
         this.$toast.success('登录成功')
+
+        // 登录成功 跳转回原来页面
+        // back方式不严谨 后面讲功能优化时再说
+        this.$router.back()
       } catch (err) {
         console.log(err)
         if (err.response.status === 400) {
@@ -137,7 +145,7 @@ export default {
         await sendSms(this.user.mobile)
         this.$toast('发送成功')
       } catch (err) {
-        //发送失败 关闭倒计时
+        // 发送失败 关闭倒计时
         this.isCountDownShow = false
         if (err.response.status === 429) {
           this.$toast('发送太频繁，请稍后重试')
