@@ -5,13 +5,8 @@
       <div class="base-info">
         <div class="left">
           <!-- 用vant的图片组件  -->
-          <van-image
-            class="avatar"
-            fit="cover"
-            round
-            src="https://img01.yzcdn.cn/vant/cat.jpeg"
-          />
-          <span class="name">艺术头条</span>
+          <van-image class="avatar" :src="userInfo.photo" fit="cover" round />
+          <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
           <van-button round size="mini">编辑资料</van-button>
@@ -19,20 +14,20 @@
       </div>
       <div class="data-stats">
         <div class="data-item">
-          <span class="count">10</span>
+          <span class="count">{{ userInfo.art_count }}</span>
           <span class="text">头条</span>
         </div>
         <div class="data-item">
-          <span class="count">12</span>
+          <span class="count">{{ userInfo.follow_count }}</span>
           <span class="text">关注</span>
         </div>
         <div class="data-item">
           <span class="count">10</span>
-          <span class="text">粉丝</span>
+          <span class="text">{{ userInfo.fans_count }}</span>
         </div>
         <div class="data-item">
           <span class="count">8</span>
-          <span class="text">获赞</span>
+          <span class="text">{{ userInfo.like_count }}</span>
         </div>
       </div>
     </div>
@@ -74,6 +69,7 @@
 <script>
 // 把容器当中的数据映射到组件当中
 import { mapState } from 'vuex'
+import { getUserInfo } from '@/api/user'
 
 export default {
   // 组件名称
@@ -84,7 +80,9 @@ export default {
   props: {},
   // 组件状态值
   data() {
-    return {}
+    return {
+      userInfo: {} //用户信息
+    }
   },
   // 计算属性
   computed: {
@@ -96,7 +94,12 @@ export default {
   /**
    * 组件实例创建完成，属性已绑定，但DOM还未生成，el属性还不存在
    */
-  created() {},
+  created() {
+    // 如果用户登陆了，则请求加载用户信息数据
+    if (this.user) {
+      this.loadUserInfo()
+    }
+  },
   /**
    * el 被新创建的 vm.el 替换，并挂载到实例上去之后调用该钩子。
    * 如果 root 实例挂载了一个文档内元素，当 mounted 被调用时 vm.el 也在文档内。
@@ -124,6 +127,14 @@ export default {
         })
 
       // 确认退出：清除登录状态：容器中的user和本地存储中的user
+    },
+    async loadUserInfo() {
+      try {
+        const { data } = await getUserInfo()
+        this.userInfo = data.data
+      } catch (err) {
+        this.$toast('获取数据失败，请稍后重试') //401表示token无效，已经过期了  请求接口的时候必须带上token
+      }
     }
   }
 }

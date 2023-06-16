@@ -60,12 +60,18 @@ export default {
 <style scoped lang="less">
 .layout-container {
   .layout-tabbar {
-    height: 103px;
+    height: 70px;
+    line-height: 60px;
+
     .toutiao {
-      font-size: 40px;
+      font-size: 25px;
     }
     .text {
-      font-size: 20px;
+      font-size: 18px;
+    }
+    /deep/ .van-tabbar-item {
+      margin-top: 5px;
+      height: 40px;
     }
   }
 }
