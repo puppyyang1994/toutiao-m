@@ -27,14 +27,30 @@
         <article-list :channel="channel" />
         <!-- 文章列表 -->
       </van-tab>
-
       <!-- 加一个插槽占位 这样就不会遮挡最后一个内容 这是一个经验 -->
       <div slot="nav-right" class="placeholder"></div>
       <!-- 使用汉堡按钮 -->
-      <div slot="nav-right" class="hamburger-btn">
+      <div
+        slot="nav-right"
+        class="hamburger-btn"
+        @click="isChannelEditShow = true"
+      >
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </van-tabs>
+
+    <!-- 频道编辑弹出层 -->
+    <van-popup
+      v-model="isChannelEditShow"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '100%' }"
+    >
+      <!-- 把弹出层里的内容 再封装成一个独立的组件，这样代码结构清晰 -->
+      <channel-edit :my-channels="channels" :active="active" />
+    </van-popup>
+    <!-- 记得用闭合标签 -->
   </div>
 </template>
 
@@ -43,18 +59,20 @@ import { getUserChannels } from '@/api/user'
 
 // 引入子组件（文章列表）
 import ArticleList from './components/article-list.vue'
+import ChannelEdit from './components/channel-edit.vue'
 export default {
   // 组件名称
   name: 'HomeIndex',
   // 局部注册的组件
-  components: { ArticleList },
+  components: { ArticleList, ChannelEdit },
   // 组件参数 接收来自父组件的数据
   props: {},
   // 组件状态值
   data() {
     return {
       active: 0, //借助这个变量来识别当前所选择的频道
-      channels: [] //定义一个数据 用来获取频道列表数据
+      channels: [], //定义一个数据 用来获取频道列表数据
+      isChannelEditShow: false
     }
   },
   // 计算属性
@@ -116,14 +134,19 @@ export default {
     .van-tab__text {
       height: 80px;
       line-height: 80px;
+      text-align: center;
+    }
+    .van-tab__text:last-child {
+      width: 50px;
     }
     .van-tab {
-      min-width: 80px;
+      min-width: 82px;
       border-right: 1px solid #edeff3;
       font-size: 15px;
       color: #777777;
-      z-index: 1;
+      // z-index: 1;   //这个不能加 不然汉堡按钮的弹出层 出不来的
     }
+
     .van-tab--active {
       color: #333333;
     }
@@ -138,11 +161,12 @@ export default {
       height: 6px;
       background: #3296fa;
     }
+    .placeholder {
+      width: 100px;
+      height: 50px;
+    }
   }
-  .placeholder {
-    width: 60px;
-    height: 50px;
-  }
+
   // 汉堡按钮样式
   .hamburger-btn {
     position: fixed;
@@ -150,7 +174,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 60px;
+    width: 50px;
     height: 50px;
     background-color: #fff;
     opacity: 0.902; //透明效果

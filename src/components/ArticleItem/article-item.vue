@@ -94,7 +94,7 @@ export default {
   .label-info-wrap span {
     font-size: 11px;
     color: #b4b4b4;
-    margin-right: 20px;
+    margin-right: 15px;
   }
   .cover-wrap {
     display: flex;
