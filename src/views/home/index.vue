@@ -1,7 +1,7 @@
 <template>
   <div class="home-container">
     <!-- 导航栏 -->
-    <van-nav-bar class="page-nav-bar">
+    <van-nav-bar class="page-nav-bar" fixed>
       <!-- 搜索栏 -->
       <van-button
         class="search-btn"
@@ -40,6 +40,7 @@
 
 <script>
 import { getUserChannels } from '@/api/user'
+
 // 引入子组件（文章列表）
 import ArticleList from './components/article-list.vue'
 export default {
@@ -89,6 +90,7 @@ export default {
 
 <style scoped lang="less">
 .home-container {
+  padding-top: 92px;
   padding-bottom: 80px;
   // deep是深度递归的意思 在css类名或者id名前面加上，从而找到对应的标签
   /deep/ .van-nav-bar__title {
@@ -104,6 +106,11 @@ export default {
   // 给tabs添加样式  vant自带的样式 类名可以通过去开发工具里面看
   /deep/ .channel-tabs {
     .van-tabs__wrap {
+      position: fixed;
+      top: 46px;
+      z-index: 1;
+      left: 0;
+      right: 0;
       height: 50px;
     }
     .van-tab__text {
