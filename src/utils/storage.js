@@ -5,7 +5,7 @@
 export const setItem = (key, value) => {
 // 将数组，对象类型的数据转为JSON格式字符串进行存储
   if (typeof value === 'object') {
-    JSON.stringify(window.localStorage.setItem(key, value))
+    value = JSON.stringify(value)
   }
   window.localStorage.setItem(key, value)
 }

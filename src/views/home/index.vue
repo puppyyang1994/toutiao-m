@@ -48,7 +48,11 @@
       :style="{ height: '100%' }"
     >
       <!-- 把弹出层里的内容 再封装成一个独立的组件，这样代码结构清晰 -->
-      <channel-edit :my-channels="channels" :active="active" />
+      <channel-edit
+        :my-channels="channels"
+        :active="active"
+        @update-active="onUpdateActive"
+      />
     </van-popup>
     <!-- 记得用闭合标签 -->
   </div>
@@ -101,6 +105,12 @@ export default {
       } catch (err) {
         this.$toast.fail('获取失败', res)
       }
+    },
+    // index 是子组件穿过来的索引
+    // isChannelEditShow = true 是ES6语法 如果 有参数就不执行 如果没参数就执行
+    onUpdateActive(index, isChannelEditShow = true) {
+      this.active = index
+      this.isChannelEditShow = isChannelEditShow //控制弹层的显示和隐藏
     }
   }
 }

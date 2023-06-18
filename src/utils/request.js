@@ -1,29 +1,42 @@
 /* 请求模板 */
+import axios from "axios"
+import jsonBig from "json-bigint"
+import store from "@/store"
+import router from "@/router"
 
-import axios from 'axios'
-import store from '@/store'
-
+// axios.create 方法：复制一个 axios
 const request = axios.create({
-  baseURL: 'http://toutiao.itheima.net',
-  timeout: 20000 // 20秒超时时间(请求20秒无响应直接判定超时)
-})
+  baseURL: "http://toutiao.itheima.net" // 基础路径
+});
 
-/// 请求拦截器
-// Add a request interceptor
-request.interceptors.request.use(function(config) {
-  // 请求发起会经过这里
-  // config：本次请求的请求配置对象
-  const { user } = store.state
-  if (user && user.token) {
-    config.headers.Authorization = `Bearer ${user.token}`
+/**
+ * 配置处理后端返回数据中超出 js 安全整数范围问题
+ */
+request.defaults.transformResponse = [
+  function(data) {
+    try {
+      return jsonBig.parse(data);
+    } catch (err) {
+      return data
+    }
   }
+];
 
-  // 注意：这里务必要返回 config 配置对象，否则请求就停在这里出不去了
-  return config
-}, function(error) {
-  // 如果请求出错了（还没有发出去）会进入这里
-  return Promise.reject(error)
-})
+// 请求拦截器
+request.interceptors.request.use(
+  function(config) {
+    const user = store.state.user
+    if (user) {
+      config.headers.Authorization = `Bearer ${user.token}`
+    }
+    // Do something before request is sent
+    return config
+  },
+  function(error) {
+    // Do something with request error
+    return Promise.reject(error)
+  }
+);
 
 // 响应拦截器
 request.interceptors.response.use(
