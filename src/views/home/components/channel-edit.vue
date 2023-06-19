@@ -59,7 +59,11 @@
 </template>
 
 <script>
-import { getAllChannels, addUserChannel } from '@/api/channels'
+import {
+  getAllChannels,
+  addUserChannel,
+  deleteUserChannel
+} from '@/api/channels'
 import { mapState } from 'vuex'
 import { setItem } from '@/utils/storage'
 
@@ -175,19 +179,34 @@ export default {
         if (this.fixedChannels.includes(channel.id)) {
           return
         }
+        // 2. 删除频道项
+        // 删除元素
+        // splice
+        this.myChannels.splice(index, 1)
         if (index <= this.active) {
           // 让激活频道的索引-1  active是父组件的数据
           this.$emit('update-active', this.active - 1, true)
         }
-        // 删除元素
-        // splice
-        this.myChannels.splice(index, 1)
+        this.deleteChannel(channel)
       } else {
         // 非编辑状态， 切换频道
         // 子组件不能修改父组件传过来的props里面的数据 如果要修改
         // 子组件可以给父组件发一个通知， 让他自己修改
         // update-active 是子组件自定义事件名  index是传递给父组件的数据
         this.$emit('update-active', index, false)
+      }
+    },
+    async deleteChannel(channel) {
+      if (this.user) {
+        // 已登录 则将数据更新到线上
+        try {
+          await deleteUserChannel(channel.id)
+        } catch (error) {
+          this.$toast('操作失败，请稍微重试', error)
+        }
+      } else {
+        // 未登录
+        setItem('TOUTIAO', this.myChannels)
       }
     }
   }

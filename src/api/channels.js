@@ -24,3 +24,11 @@ export const addUserChannel = (channel)=>{
         }
     })
 }
+
+// 删除用户频道
+export const deleteUserChannel = channelId =>{
+    return request({
+        method:'DELETE',
+        url:`/v1_0/user/channels/${channelId}`
+    })
+}

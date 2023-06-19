@@ -10,6 +10,7 @@
         size="small"
         round
         icon="search"
+        to="/search"
         >搜索</van-button
       >
     </van-nav-bar>
@@ -64,6 +65,8 @@ import { getUserChannels } from '@/api/user'
 // 引入子组件（文章列表）
 import ArticleList from './components/article-list.vue'
 import ChannelEdit from './components/channel-edit.vue'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/storage'
 export default {
   // 组件名称
   name: 'HomeIndex',
@@ -80,7 +83,9 @@ export default {
     }
   },
   // 计算属性
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   // 侦听器
   watch: {},
   // 生命周期钩子   注：没用到的钩子请自行删除
@@ -99,9 +104,27 @@ export default {
   methods: {
     async loadChannels() {
       try {
-        const { data } = await getUserChannels()
+        // const { data } = await getUserChannels()
         // console.log('获取成功', data)
-        this.channels = data.data.channels
+        // this.channels = data.data.channels
+        // 已登录 请求获取用户频道列表
+        let channels = []
+        if (this.user) {
+          const { data } = await getUserChannels()
+          channels = data.data.channels
+        } else {
+          // 未登录 判断是否有本地的频道列表数据
+          const localChannels = getItem('TOUTIAO_CHANNELS')
+          // 有 拿来使用
+          if (localChannels) {
+            channels = localChannels
+          } else {
+            // 没有 请求获取默认频道列表
+            const { data } = await getUserChannels()
+            channels = data.data.channels
+          }
+        }
+        this.channels = channels
       } catch (err) {
         this.$toast.fail('获取失败', res)
       }
