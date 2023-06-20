@@ -1,6 +1,12 @@
 <template>
   <div class="search-suggestion">
-    <van-cell icon="search" v-for="(text, index) in suggestions" :key="index">
+    <!-- 给父组件发一个自定义事件 search 然后去父组件中监听 -->
+    <van-cell
+      icon="search"
+      v-for="(text, index) in suggestions"
+      :key="index"
+      @click="$emit('search', text)"
+    >
       <div slot="title" v-html="highlight(text)"></div>
     </van-cell>
     <!-- 使用双花括号绑定会直接输出纯文本内容 -->
@@ -75,6 +81,11 @@ export default {
     },
     // 高亮文字
     highlight(text) {
+      // 在调用replace方法之前，text参数的值为null或undefined。
+      // 请确保在调用highlight方法时，传递一个有效的文本值作为参数。
+      if (!text || !this.searchText) {
+        return text // 如果text或searchText为空，直接返回原始的text
+      }
       // 拼接高亮字符串
       const highlightStr = `<span class="active">${this.searchText}</span>`
       //   正则表达式 //中间的内容 都会当做匹配字符来使用而不是数据
@@ -91,8 +102,8 @@ export default {
 
 <style scoped lang="less">
 .search-suggestion {
-/deep/  span.active {
-      color:#3296fa;
-    } 
+  /deep/ span.active {
+    color: #3296fa;
+  }
 }
 </style>

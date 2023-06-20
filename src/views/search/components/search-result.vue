@@ -6,25 +6,38 @@
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <van-cell v-for="item in list" :key="item" :title="item" />
+      <!-- 注意给title不是直接传title title是一个对象 而应该是传他的属性 item.title -->
+      <van-cell
+        v-for="(article, index) in list"
+        :key="index"
+        :title="article.title"
+      />
     </van-list>
   </div>
 </template>
 
 <script>
+import { getSearchResult } from '@/api/search'
 export default {
   // 组件名称
   name: 'SearchResult',
   // 局部注册的组件
   components: {},
   // 组件参数 接收来自父组件的数据
-  props: {},
+  props: {
+    searchText: {
+      type: String,
+      required: true
+    }
+  },
   // 组件状态值
   data() {
     return {
       list: [],
       loading: false,
-      finished: false
+      finished: false,
+      page: 1, //自己定义一个page
+      per_page: 20
     }
   },
   // 计算属性
@@ -43,22 +56,31 @@ export default {
   mounted() {},
   // 组件方法
   methods: {
-    onLoad() {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
-
-        // 加载状态结束
+    async onLoad() {
+      try {
+        // 1. 请求获取数据
+        const { data } = await getSearchResult({
+          page: this.page, //页码
+          per_page: this.per_page, //每页大小
+          q: this.searchText
+        })
+        // console.log(data)
+        // 2.将数据添加到数组列表中
+        const { results } = data.data
+        this.list.push(...results)
+        // 3.将本次加载中的loading关闭
         this.loading = false
-
-        // 数据全部加载完成
-        if (this.list.length >= 40) {
+        // 4.判断是否还有数据， 如
+        // 如果没有：将加载更新的状态设置为结束
+        if (results.length) {
+          // 果有：更新获取下一个数据的页码
+          this.page++
+        } else {
           this.finished = true
         }
-      }, 1000)
+      } catch (error) {
+        this.$toast('数据获取失败，请稍后重试', error)
+      }
     }
   }
 }

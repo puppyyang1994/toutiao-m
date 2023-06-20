@@ -16,11 +16,15 @@
       <!-- 重新获得焦点后 显示推荐 不显示结果 -->
     </form>
     <!-- 3.搜索结果 -->
-    <search-result v-if="isResultShow" />
+    <search-result v-if="isResultShow" :search-text="searchText" />
     <!-- /3.搜索结果 -->
 
     <!-- 2. 联想建议 -->
-    <search-suggestion v-else-if="searchText" :search-text="searchText" />
+    <search-suggestion
+      :search-text="searchText"
+      v-else-if="searchText"
+      @search="onSearch"
+    />
     <!-- 2 联想建议 -->
     <!-- 1.搜索历史记录 -->
     <search-history v-else />
@@ -68,8 +72,9 @@ export default {
   // 组件方法
   methods: {
     onSearch(val) {
+      this.searchText = val
       this.isResultShow = true
-      console.log(val)
+      // console.log(val)
     },
     onCancel() {
       //   点击取消后 让页面回到首页
