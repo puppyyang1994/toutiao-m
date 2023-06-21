@@ -43,6 +43,15 @@ const routes = [
     path: '/search',
     name: 'search',
     component: () => import('@/views/search')
+  },
+  // 添加详情页路由
+  {
+    // 要配置成动态路由
+    path:'/article/:articleId',
+    name:'article',
+    component:()=>import('@/views/article'),
+    props:true //将$route.params作为组件的props
+    // 开启props传参 把路由参数映射到组件的props参数中
   }
 
 ]

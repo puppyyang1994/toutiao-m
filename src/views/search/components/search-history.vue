@@ -1,24 +1,21 @@
 <template>
   <div class="search-history">
     <van-cell title="搜索历史">
-      <span>全部删除</span>
-      <span>完成</span>
-      <van-icon name="delete-o" />
+      <div v-if="isDeleteShow">
+        <!-- 全部删除 需要父组件监听clear-search-history事件 去父组件中清空数组 -->
+        <span @click="$emit('clear-search-history')">全部删除</span>
+        &nbsp;&nbsp;
+        <span @click="isDeleteShow = false">完成</span>
+      </div>
+      <van-icon v-else name="delete-o" @click="isDeleteShow = true" />
     </van-cell>
-    <van-cell title="hello">
-      <van-icon name="close" />
-    </van-cell>
-
-    <van-cell title="hello">
-      <van-icon name="close" />
-    </van-cell>
-
-    <van-cell title="hello">
-      <van-icon name="close" />
-    </van-cell>
-
-    <van-cell title="hello">
-      <van-icon name="close" />
+    <van-cell
+      :title="item"
+      v-for="(item, index) in searchHistories"
+      :key="index"
+      @click="onSearchIteClick(item, index)"
+    >
+      <van-icon v-show="isDeleteShow" name="close" />
     </van-cell>
   </div>
 </template>
@@ -30,10 +27,18 @@ export default {
   // 局部注册的组件
   components: {},
   // 组件参数 接收来自父组件的数据
-  props: {},
+  props: {
+    searchHistories: {
+      type: Array,
+      required: true
+    }
+  },
   // 组件状态值
   data() {
-    return {}
+    return {
+      // 定义当前是否是删除状态  然后根据他来进行条件渲染
+      isDeleteShow: false
+    }
   },
   // 计算属性
   computed: {},
@@ -50,7 +55,18 @@ export default {
    */
   mounted() {},
   // 组件方法
-  methods: {}
+  methods: {
+    onSearchIteClick(item, index) {
+      // 如果是删除状态， 就执行删除操作
+      if (this.isDeleteShow) {
+        this.searchHistories.splice(index, 1)
+      } else {
+        // 如果斯非删除状态 就执行搜索操作
+        // 需要在父组件中监听search触发onSearch事件处理函数
+        this.$emit('search', item)
+      }
+    }
+  }
 }
 </script>
 

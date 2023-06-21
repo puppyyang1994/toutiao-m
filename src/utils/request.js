@@ -1,26 +1,34 @@
 /* 请求模板 */
 import axios from "axios"
-import jsonBig from "json-bigint"
+import JSONBig from "json-bigint"  //解决安全整数范围问题
+// 提供了两个方法  JSONBig.parse 把JSON格式的字符串转为JS对象
+// 和JSONBig.stringfy  把JS对象转为JSON格式的字符串
 import store from "@/store"
 import router from "@/router"
 
+// 注意JSONBig的书写 不能写成jsonBig 否则不生效
+//使用的时候 需要把BigNumber 类型的数据转为字符串来使用
+
 // axios.create 方法：复制一个 axios
 const request = axios.create({
-  baseURL: "http://toutiao.itheima.net" // 基础路径
+  baseURL: "http://toutiao.itheima.net",// 基础路径
+  transformResponse:[function (data) {
+        try {
+          return JSONBig.parse(data)  //data就是后端返回的原始数据 // 说白了就是JSON格式的字符串
+          
+        } catch (err) {
+          return data
+        }
+      }
+    ]
 });
 
 /**
  * 配置处理后端返回数据中超出 js 安全整数范围问题
  */
-request.defaults.transformResponse = [
-  function(data) {
-    try {
-      return jsonBig.parse(data);
-    } catch (err) {
-      return data
-    }
-  }
-];
+// 自定义后端返回的原始数据
+// axios默认会在内部这样来处理后端返回的数据
+
 
 // 请求拦截器
 request.interceptors.request.use(

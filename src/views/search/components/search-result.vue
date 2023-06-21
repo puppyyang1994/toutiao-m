@@ -4,6 +4,8 @@
       v-model="loading"
       :finished="finished"
       finished-text="没有更多了"
+      :error.sync="error"
+      error-text="加载失败"
       @load="onLoad"
     >
       <!-- 注意给title不是直接传title title是一个对象 而应该是传他的属性 item.title -->
@@ -37,7 +39,8 @@ export default {
       loading: false,
       finished: false,
       page: 1, //自己定义一个page
-      per_page: 20
+      per_page: 20,
+      error: false
     }
   },
   // 计算属性
@@ -79,6 +82,9 @@ export default {
           this.finished = true
         }
       } catch (error) {
+        this.error = true
+        // 加载失败了 loading也要关闭
+        this.loading = false
         this.$toast('数据获取失败，请稍后重试', error)
       }
     }

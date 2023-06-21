@@ -12,3 +12,11 @@ export const getArticle = (params)=>{
 
     })
 }
+
+// 获取文章详情
+export const getArticleById= (articleId)=>{
+    return request({
+        method:'GET',
+        url:`/v1_0/articles/${articleId}` //天哪 这里的路径一定要注意啊  之前：王姐删除了~~~
+    })
+}
