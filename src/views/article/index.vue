@@ -35,20 +35,18 @@
           <div slot="label" class="publish-date">
             {{ article.pubdate | relativeTime }}
           </div>
-          <van-button
+          <!-- <follow-user
             class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-            >关注</van-button
-          >
-          <!-- <van-button
+            :is-followed="article.is_followed"
+            :user-id="article.aut_id"
+            @update-is_followed="article.is_followed"
+          /> -->
+          <!-- 如果传给子组件的数据 既要用 又要改 则可以使用v-model语法糖 -->
+          <follow-user
             class="follow-btn"
-            round
-            size="small"
-          >已关注</van-button> -->
+            v-model="article.is_followed"
+            :user-id="article.aut_id"
+          />
         </van-cell>
         <!-- /用户信息 -->
 
@@ -97,12 +95,15 @@
 <script>
 import { getArticleById } from '@/api/article'
 import { ImagePreview } from 'vant'
+import FollowUser from '@/components/FollowUser/index.vue'
 
 export default {
   // 组件名称
   name: 'ArticleIndex',
   // 局部注册的组件
-  components: {},
+  components: {
+    FollowUser
+  },
   // 通过props获取路由参数
   props: {
     articleId: {
@@ -118,7 +119,8 @@ export default {
     return {
       article: {}, //文章详情
       loading: true, //加载中的loading状态
-      err_status: 0 //失败404状态码
+      err_status: 0, //失败404状态码
+      followLoading: false
     }
   },
   // 计算属性
