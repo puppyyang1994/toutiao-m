@@ -59,12 +59,27 @@
           ref="article-content"
         ></div>
         <van-divider>正文结束</van-divider>
+        <!-- 评论列表 -->
+        <!-- 来父组件中监听子组件的自定义事件 -->
+        <common-list
+          :source="article.art_id"
+          @onload-success="totalCommentCount === $event.total_count"
+        ></common-list>
+        <!-- 注意这里的$event 是子组件传过来的参数 data.data -->
+        <!-- /评论列表 -->
         <!-- 底部区域 -->
         <div class="article-bottom">
           <van-button class="comment-btn" type="default" round size="small"
             >写评论
           </van-button>
-          <van-icon class="comment-icon" name="comment-o" badge="123" />
+          <!-- badge 显示有几条评论 -->
+          <!-- 在父组件中使用子组件data中的数据  那个total_count -->
+          <!-- 先在父组件中 声明一个数据 帮给badge -->
+          <van-icon
+            class="comment-icon"
+            name="comment-o"
+            :badge="totalCommentCount"
+          />
           <!-- <van-button class="btn-item" icon="star-o" /> -->
           <!-- 子组件 既要用又要改  所以就是用v-model=article.is_collected -->
           <collect-article
@@ -109,6 +124,7 @@ import { ImagePreview } from 'vant'
 import FollowUser from '@/components/FollowUser/index.vue'
 import CollectArticle from '@/components/CollectArticle/collect-article.vue'
 import LikeArticle from '@/components/LikeArticle/like-article.vue'
+import CommonList from './components/common-list.vue'
 
 export default {
   // 组件名称
@@ -117,7 +133,8 @@ export default {
   components: {
     FollowUser,
     CollectArticle,
-    LikeArticle
+    LikeArticle,
+    CommonList
   },
   // 通过props获取路由参数
   props: {
@@ -135,7 +152,8 @@ export default {
       article: {}, //文章详情
       loading: true, //加载中的loading状态
       err_status: 0, //失败404状态码
-      followLoading: false
+      followLoading: false,
+      totalCommentCount: 0 //在父组件中先声明一个数据 绑给badge
     }
   },
   // 计算属性

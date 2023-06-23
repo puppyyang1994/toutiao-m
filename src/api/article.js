@@ -60,3 +60,4 @@ export const deleteLike = target =>{
         url:`/v1_0/article/likings/${target}`
     })
 }
+
