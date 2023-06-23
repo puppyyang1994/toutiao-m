@@ -20,3 +20,43 @@ export const getArticleById= (articleId)=>{
         url:`/v1_0/articles/${articleId}` //天哪 这里的路径一定要注意啊  之前：王姐删除了~~~
     })
 }
+
+// 收藏文章接口封装
+export const addCollect = target =>{
+    return request({
+        method:'POST',
+        url:'/v1_0/article/collections',
+        data:{
+            target
+        }
+
+    })
+}
+// 取消收藏文章接口封装
+export const deleteCollect = target =>{
+    return request({
+        method:'DELETE',
+        url:`/v1_0/article/collections/${target}`,
+       
+    })
+}
+
+
+// 文章点赞
+export const addLike = target =>{
+    return request({
+        method:'POST',
+        url:'/v1_0/article/likings',
+        data:{
+            target
+        }
+    })
+}
+
+// 取消对文章点赞
+export const deleteLike = target =>{
+    return request({
+        method:'DELETE',
+        url:`/v1_0/article/likings/${target}`
+    })
+}
