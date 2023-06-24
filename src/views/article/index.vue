@@ -62,14 +62,21 @@
         <!-- 评论列表 -->
         <!-- 来父组件中监听子组件的自定义事件 -->
         <common-list
+          :list="commentList"
           :source="article.art_id"
           @onload-success="totalCommentCount === $event.total_count"
+          @reply-click="onReplyClick"
         ></common-list>
         <!-- 注意这里的$event 是子组件传过来的参数 data.data -->
         <!-- /评论列表 -->
         <!-- 底部区域 -->
         <div class="article-bottom">
-          <van-button class="comment-btn" type="default" round size="small"
+          <van-button
+            @click="isPostShow = true"
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
             >写评论
           </van-button>
           <!-- badge 显示有几条评论 -->
@@ -97,6 +104,16 @@
           <van-icon name="share" color="#777777"></van-icon>
         </div>
         <!-- /底部区域 -->
+        <!-- 评论弹出层 -->
+
+        <van-popup v-model="isPostShow" position="bottom">
+          <!-- 因为有可能是评论的id 也有可能是文章的id 所以命名成target 而不是 article-id -->
+          <comment-post
+            @post-success="onPostSuccess($event)"
+            :target="article.art_id"
+          />
+        </van-popup>
+        <!-- /评论弹出层 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -115,6 +132,18 @@
       </div>
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
+    <!-- 评论回复 -->
+    <van-popup
+      v-model="isReplyShow"
+      get-container="body"
+      round
+      position="bottom"
+      :style="{ height: '90%' }"
+    >
+      <!-- <comment-reply :comment="currentComment" @close="isReplyShow = false" /> -->
+      <comment-reply :comment="currentComment" v-if="isReplyShow" />
+    </van-popup>
+    <!-- /评论回复 -->
   </div>
 </template>
 
@@ -125,6 +154,8 @@ import FollowUser from '@/components/FollowUser/index.vue'
 import CollectArticle from '@/components/CollectArticle/collect-article.vue'
 import LikeArticle from '@/components/LikeArticle/like-article.vue'
 import CommonList from './components/common-list.vue'
+import CommentPost from './components/comment-post.vue'
+import CommentReply from './components/comment-reply.vue'
 
 export default {
   // 组件名称
@@ -134,7 +165,15 @@ export default {
     FollowUser,
     CollectArticle,
     LikeArticle,
-    CommonList
+    CommonList,
+    CommentPost,
+    CommentReply
+  },
+  // 给所有的后代组件提供数据  因为组件们几乎都用到了id这个数据
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
   },
   // 通过props获取路由参数
   props: {
@@ -153,7 +192,11 @@ export default {
       loading: true, //加载中的loading状态
       err_status: 0, //失败404状态码
       followLoading: false,
-      totalCommentCount: 0 //在父组件中先声明一个数据 绑给badge
+      totalCommentCount: 0, //在父组件中先声明一个数据 绑给badge
+      isPostShow: false, //发布评论的显示状态
+      commentList: [], //评论列表
+      isReplyShow: false, //控制展示回复弹层的显示状态
+      currentComment: {} //点击回复的那个评论项
     }
   },
   // 计算属性
@@ -216,6 +259,20 @@ export default {
           })
         }
       })
+    },
+    // 子组件传来的数据对象
+    onPostSuccess(data) {
+      // 关闭弹出层
+      this.isPostShow = false
+      // 将发布内容显示到列表顶部
+      this.commentList.unshift(data.new_obj)
+      this.totalCommentCount++ //将评论数加1
+    },
+    onReplyClick(comment) {
+      // 将子组件传递过来的comment对象 给当前comment对象
+      console.log(comment)
+      this.currentComment = comment
+      this.isReplyShow = true
     }
   }
 }

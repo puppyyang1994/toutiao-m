@@ -1,11 +1,13 @@
 <template>
   <!-- 列表组件有一个特点， 不在他的可是区域 他不会加载更多 -->
+  <!-- 加上 immediate-check属性（是否在初始化时立即执行滚动位置检查-->
   <van-list
     v-model="loading"
     :finished="finished"
     finished-text="没有更多了"
     :error="error"
     error-text="加载失败，请点击重试"
+    :immediate-check="false"
     @load="onLoad"
   >
     <!--   <van-cell
@@ -14,7 +16,14 @@
       :title="item.content"
     /> -->
     <!-- 把获取到的数据遍历项comment传给子组件 然哦户去子组件中声明接收  -->
-    <comment-item v-for="(item, index) in list" :key="index" :comment="item" />
+    <!-- 来到父组件中 监听处理子组件comment item发过来的自定义事件 -->
+    <!-- comment list再把它传给 article详情页 -->
+    <comment-item
+      v-for="(item, index) in list"
+      :key="index"
+      :comment="item"
+      @reply-click="$emit('reply-click', $event)"
+    />
   </van-list>
 </template>
 
@@ -33,12 +42,27 @@ export default {
     source: {
       type: [Number, String, Object],
       required: true
+    },
+    // 本来是子组件中的list 为了让父组件来操作这个数据
+    // 可以写到props里 然后 让父组件传这个list给子组件
+    list: {
+      type: Array,
+      // required:true 非必须
+      default: () => []
+    },
+    // 自定义prop数据验证
+    type: {
+      type: String,
+      validator(value) {
+        return ['a', 'c'].includes(value)
+      },
+      default: 'a'
     }
   },
   // 组件状态值
   data() {
     return {
-      list: [],
+      //   list: [],
       loading: false,
       finished: false,
       offset: null, //获取下一页的一个标记
@@ -56,6 +80,9 @@ export default {
    */
   created() {
     // 一上来就渲染出来 还没有拉倒底部  评论列表就自动出来了
+    // 当手动初始化onLoad的话 它不会自动开始初识的loading
+    // 所以我们要手动的开始loading
+    this.loading = true
     this.onLoad()
   },
   /**
@@ -69,8 +96,8 @@ export default {
       try {
         // 1.请求获取数据
         const { data } = await getComments({
-          type: 'a ', //评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
-          source: this.source, //文章id或评论id
+          type: this.type, //评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+          source: this.source.toString(), //文章id或评论id
           //   获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
           offset: this.offset, //相当于页面
           limit: this.limit //获取的评论数据个数，不传表示采用后端服务设定的默认每页数据量

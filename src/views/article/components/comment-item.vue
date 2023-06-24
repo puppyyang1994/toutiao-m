@@ -29,7 +29,11 @@
         <span class="comment-pubdate">{{
           comment.pubdate | relativeTime
         }}</span>
-        <van-button class="reply-btn" round
+        <!-- 当点击回复按钮的时候 展示弹层 对外发布自定义事件 -->
+        <van-button
+          class="reply-btn"
+          round
+          @click="$emit('reply-click', comment)"
           >回复 {{ comment.reply_count }}</van-button
         >
       </div>
@@ -79,10 +83,10 @@ export default {
         if (this.comment.is_liking) {
           // 已经点赞 取消点赞
           await deleteCommentLike(this.comment.com_id)
-          this.comment.like_count--
+          // this.comment.like_count--
         } else {
           await addCommentLike(this.comment.com_id)
-          this.comment.like_count++
+          // this.comment.like_count++
         }
         this.comment.is_liking = !this.comment.is_liking
       } catch (error) {
@@ -97,9 +101,9 @@ export default {
 <style scoped lang="less">
 .comment-item {
   .avatar {
-    width: 72px;
-    height: 72px;
-    margin-right: 25px;
+    width: 36px;
+    height: 36px;
+    margin-right: 13px;
   }
   .title-wrap {
     display: flex;
@@ -107,40 +111,41 @@ export default {
     align-items: center;
     .user-name {
       color: #406599;
-      font-size: 26px;
+      font-size: 13px;
     }
   }
   .comment-content {
-    font-size: 32px;
+    margin-top: 35px;
+    font-size: 13px;
     color: #222222;
     word-break: break-all;
     text-align: justify;
   }
   .comment-pubdate {
-    font-size: 19px;
+    font-size: 9px;
     color: #222;
-    margin-right: 25px;
+    margin-right: 12px;
   }
   .bottom-info {
     display: flex;
     align-items: center;
   }
   .reply-btn {
-    width: 135px;
-    height: 48px;
-    line-height: 48px;
-    font-size: 21px;
+    // width: 67px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 11px;
     color: #222;
   }
   .like-btn {
-    height: 30px;
+    height: 15px;
     padding: 0;
     border: none;
-    font-size: 19px;
-    line-height: 30px;
-    margin-right: 7px;
+    font-size: 10px;
+    line-height: 15px;
+    margin-right: 4px;
     .van-icon {
-      font-size: 30px;
+      font-size: 15px;
     }
     // 追加一个样式
     &.liked {
