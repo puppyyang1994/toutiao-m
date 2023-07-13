@@ -52,7 +52,14 @@ const routes = [
     component:()=>import('@/views/article'),
     props:true //将$route.params作为组件的props
     // 开启props传参 把路由参数映射到组件的props参数中
+  },
+  // 编辑用户资料
+  {
+    path:'/user/profile',
+    name:'user-profile',
+    component:()=>import('@/views/user-profile')
   }
+
 
 ]
 

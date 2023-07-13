@@ -9,7 +9,8 @@
           <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
-          <van-button round size="mini">编辑资料</van-button>
+          <!-- 点击编辑资料 跳转页面 -->
+          <van-button round size="mini" to="/user/profile">编辑资料</van-button>
         </div>
       </div>
       <div class="data-stats">
